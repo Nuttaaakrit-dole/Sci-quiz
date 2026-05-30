@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แบบทดสอบวิทยาศาสตร์ สกร. ชุดที่ 2 (ระดับประถมศึกษา)</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    /* ปรับโทนสีเป็น Ocean Blue เพื่อให้แยกกับชุดที่ 1 ได้ง่ายขึ้น */
+    --primary: #0277bd; --primary-dark: #01579b; --primary-light: #e1f5fe;
+    --green: #3B6D11; --green-light: #EAF3DE;
+    --red: #A32D2D; --red-light: #FCEBEB;
+    --gray-bg: #f5f4f0; --gray-card: #fff; --gray-border: #e0e0e0;
+    --text: #1a1a1a; --text-muted: #666;
+  }
+  body { font-family: 'Sarabun', sans-serif; background: var(--gray-bg); color: var(--text); padding-bottom: 40px; }
+  .container { max-width: 680px; margin: 0 auto; padding: 16px; }
+  
+  .header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 16px; padding: 24px; color: #fff; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+  .title { font-size: 22px; font-weight: 700; margin-bottom: 5px; line-height: 1.4; }
+  .subtitle { font-size: 14px; opacity: 0.9; }
+
+  .card { background: var(--gray-card); border-radius: 16px; padding: 24px; border: 1px solid var(--gray-border); margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  
+  .inp-group { margin-bottom: 16px; text-align: left; }
+  .inp-label { display: block; font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
+  .inp-text { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--gray-border); font-family: 'Sarabun', sans-serif; font-size: 16px; background: #fafafa; }
+  
+  .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-family: 'Sarabun', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-secondary { background: #e0e0e0; color: var(--text); width: 48%; }
+  
+  .nav-buttons { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
+  .nav-buttons .btn-primary { width: 48%; }
+
+  .prog-text { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .prog-bar { background: #eee; height: 10px; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  .prog-fill { background: var(--primary); height: 100%; width: 0%; transition: 0.3s; }
+
+  .q-badge { font-size: 12px; color: var(--primary); font-weight: 700; margin-bottom: 12px; }
+  .q-text { font-size: 18px; font-weight: 600; margin-bottom: 20px; line-height: 1.6; }
+
+  /* ปรับปรุงโครงสร้างปุ่มให้ความสูงเท่ากันเสมอ */
+  .choices { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 9px;
+    align-items: stretch; /* ให้ปุ่มขยายความสูงเท่ากันในกรณีที่มีหลายบรรทัด */
+  }
+  
+  .choice { 
+    display: flex; 
+    align-items: center; 
+    background: #fff; 
+    border: 2px solid var(--gray-border); 
+    padding: 12px 16px; 
+    border-radius: 12px; 
+    cursor: pointer; 
+    font-size: 15px; 
+    font-family: 'Sarabun', sans-serif; 
+    text-align: left; 
+    transition: 0.2s; 
+    width: 100%;
+    min-height: 60px; /* ความสูงขั้นต่ำ */
+    height: 100%; /* ให้ยืดเต็มพื้นที่ของ Flex item */
+  }
+  
+  .choice.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); font-weight: 600; }
+  .choice.correct { border-color: var(--green); background: var(--green-light); color: var(--green); font-weight: 600; }
+  .choice.wrong { border-color: var(--red); background: var(--red-light); color: var(--red); font-weight: 600; }
+  .choice:disabled { cursor: not-allowed; }
+  
+  .c-let { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 50%; margin-right: 12px; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+  .choice.selected .c-let { background: var(--primary); color: #fff; }
+  .choice.correct .c-let { background: var(--green); color: #fff; }
+  .choice.wrong .c-let { background: var(--red); color: #fff; }
+
+  .feedback { padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6; margin-top: 16px; }
+  .feedback.ok { background: var(--green-light); border: 1px solid var(--green); color: #1f3a09; }
+  .feedback.no { background: var(--red-light); border: 1px solid var(--red); color: #521717; }
+  
+  .grid-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
+  .stat-box { background: #f9f9f9; padding: 16px 10px; border-radius: 12px; text-align: center; }
+  .stat-num { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  
+  .review-item { padding: 16px 0; border-bottom: 1px solid var(--gray-border); text-align: left; }
+  .review-item:last-child { border-bottom: none; }
+  .r-q { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  .r-a { font-size: 14px; margin-bottom: 4px; }
+  .r-exp { font-size: 13px; color: var(--text-muted); background: #f5f5f5; padding: 10px; border-radius: 8px; margin-top: 8px; }
+
+  .dot-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; justify-content: center; }
+  .dot { width: 32px; height: 32px; border-radius: 8px; border: none; font-family: 'Sarabun'; font-weight: 600; font-size: 12px; cursor: pointer; background: #e0e0e0; }
+  .dot.active { background: var(--primary); color: #fff; transform: scale(1.1); }
+  .dot.ok { background: var(--green); color: #fff; }
+  .dot.no { background: var(--red); color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="badge">N-NET • สกร. อำเภอโนนสัง (ชุดที่ 2)</div>
+    <div class="title">🔬 แบบทดสอบวิทยาศาสตร์ (ขั้นประยุกต์)</div>
+    <div class="subtitle" id="subtitle-text">ระบบสุ่มข้อสอบและวิเคราะห์ผลรายบุคคล</div>
+  </div>
+  
+  <div id="app"></div>
+</div>
+
+<script>
+// ข้อมูลข้อสอบ 20 ข้อ (ชุดที่ 2 - เพิ่มความยากและเน้นการวิเคราะห์)
+const database = [
+  { cat: "สิ่งมีชีวิตและสิ่งแวดล้อม", q: "ในห่วงโซ่อาหาร [หญ้า → ตั๊กแตน → กบ → งู] หากกบถูกจับจนสูญพันธุ์ จะเกิดผลกระทบใดเป็นอันดับแรก?", choices: ["ตั๊กแตนมีจำนวนเพิ่มขึ้นอย่างรวดเร็ว", "งูมีจำนวนเพิ่มขึ้น", "หญ้าเจริญเติบโตได้ดีขึ้น", "ห่วงโซ่อาหารนี้จะล่มสลายทันที"], a: 0, exp: "เมื่อกบ (ผู้ล่าตั๊กแตน) หายไป ทำให้ไม่มีตัวคุมประชากรตั๊กแตน ตั๊กแตนจึงเพิ่มจำนวนขึ้นอย่างรวดเร็วก่อนที่ผลกระทบอื่นจะตามมา" },
+  { cat: "สิ่งมีชีวิตและสิ่งแวดล้อม", q: "ลักษณะในข้อใด 'ไม่สามารถ' ถ่ายทอดทางพันธุกรรมจากพ่อแม่สู่ลูกได้?", choices: ["แผลเป็นที่เกิดจากอุบัติเหตุ", "สีของม่านตา", "ลักยิ้มบนแก้ม", "หมู่เลือด"], a: 0, exp: "แผลเป็น เป็นลักษณะที่เกิดขึ้นภายหลัง (Acquired trait) ไม่ได้เกิดจากการเปลี่ยนแปลงของยีนหรือดีเอ็นเอ" },
+  { cat: "สิ่งแวดล้อมและทรัพยากร", q: "ปรากฏการณ์น้ำเปลี่ยนสีเป็นสีเขียวและมีปลาตายจำนวนมาก (Eutrophication) มีสาเหตุหลักมาจากสิ่งใด?", choices: ["การปล่อยน้ำทิ้งที่มีสารเคมีจากปุ๋ยการเกษตร", "การรั่วไหลของคราบน้ำมันในทะเล", "การทิ้งขยะพลาสติกลงแม่น้ำ", "การเพิ่มขึ้นของก๊าซคาร์บอนไดออกไซด์"], a: 0, exp: "สารอาหารจากปุ๋ย (ไนโตรเจนและฟอสฟอรัส) ทำใหัสาหร่ายบลูม เมื่อสาหร่ายตาย แบคทีเรียจะใช้ออกซิเจนในน้ำย่อยสลายจนน้ำเน่าเสียและปลาตาย" },
+  { cat: "สารและสมบัติของสาร", q: "หากวัตถุชิ้นหนึ่ง 'ลอย' ในน้ำ แต่ 'จม' ในน้ำมันพืช ข้อใดสรุปได้ถูกต้องที่สุด?", choices: ["วัตถุมีความหนาแน่นน้อยกว่าน้ำ แต่มากกว่าน้ำมัน", "วัตถุมีความหนาแน่นมากกว่าน้ำ แต่น้อยกว่าน้ำมัน", "น้ำและน้ำมันมีความหนาแน่นเท่ากัน", "น้ำมันมีแรงพยุงมากกว่าน้ำ"], a: 0, exp: "วัตถุลอยในของเหลวที่มีความหนาแน่นมากกว่าตัวมัน และจะจมในของเหลวที่มีความหนาแน่นน้อยกว่าตัวมัน" },
+  { cat: "สารและสมบัติของสาร", q: "การแยกสารผสมที่ประกอบด้วย 'ผงเหล็ก ทราย และเกลือ' ควรเรียงลำดับวิธีการแยกอย่างไรจึงจะเหมาะสมที่สุด?", choices: ["ใช้แม่เหล็กดูด → เติมน้ำแล้วกรอง → ระเหยแห้ง", "เติมน้ำแล้วกรอง → ใช้แม่เหล็กดูด → ระเหยแห้ง", "ระเหยแห้ง → ใช้แม่เหล็กดูด → เติมน้ำแล้วกรอง", "ร่อนด้วยตะแกรง → เติมน้ำแล้วกรอง → ระเหยแห้ง"], a: 0, exp: "แม่เหล็กดูดผงเหล็กออกก่อน -> เติมน้ำให้เกลือละลายแล้วกรองทรายออก -> นำน้ำเกลือไปร่อนระเหยแห้งเพื่อให้ได้เกลือ" },
+  { cat: "สารและสมบัติของสาร", q: "เมื่อนำของเหลวชนิดหนึ่งไปให้ความร้อนจนถึง 'จุดเดือด' อุณหภูมิของของเหลวนั้นจะเป็นอย่างไร?", choices: ["อุณหภูมิจะคงที่จนกว่าของเหลวจะกลายเป็นไอทั้งหมด", "อุณหภูมิจะสูงขึ้นเรื่อยๆ อย่างรวดเร็ว", "อุณหภูมิจะลดลงชั่วขณะแล้วจึงสูงขึ้น", "อุณหภูมิจะแกว่งขึ้นลงไม่แน่นอน"], a: 0, exp: "ในขณะที่สารกำลังเปลี่ยนสถานะ (เช่น กำลังเดือด) ความร้อนจะถูกนำไปใช้เปลี่ยนสถานะ ทำให้อุณหภูมิคงที่" },
+  { cat: "แรงและพลังงาน", q: "เสียงเดินทางผ่านตัวกลางชนิดใดได้ 'เร็วที่สุด'?", choices: ["ของแข็ง (เช่น แท่งเหล็ก)", "ของเหลว (เช่น น้ำทะเล)", "ก๊าซ (เช่น อากาศ)", "สุญญากาศ (เช่น อวกาศ)"], a: 0, exp: "เสียงเดินทางผ่านของแข็งได้เร็วที่สุด เพราะอนุภาคของของแข็งอยู่ชิดกันมากที่สุด ทำให้ส่งผ่านคลื่นกลได้รวดเร็ว (เสียงเดินทางในสุญญากาศไม่ได้)" },
+  { cat: "แรงและพลังงาน", q: "เครื่องมือเครื่องใช้ในข้อใด อาศัยหลักการทำงานของเครื่องกลอย่างง่ายประเภท 'ลิ่ม'?", choices: ["มีดและขวาน", "ไม้กวาดและคีมคีบน้ำแข็ง", "บันไดและพื้นเอียง", "พวงมาลัยรถยนต์และลูกบิดประตู"], a: 0, exp: "ลิ่ม มีลักษณะเป็นสามเหลี่ยมปลายแหลม ใช้สำหรับตอกหรือสับเพื่อแยกวัตถุออกจากกัน เช่น มีด ขวาน ตะปู" },
+  { cat: "แรงและพลังงาน", q: "ทำไมเส้นลวดในหลอดไฟแบบไส้ จึงนิยมทำมาจากโลหะทังสเตน?", choices: ["เพราะมีจุดหลอมเหลวสูงและความต้านทานสูง", "เพราะมีจุดหลอมเหลวต่ำและนำไฟฟ้าได้ดีมาก", "เพราะมีน้ำหนักเบาและราคาถูก", "เพราะไม่ทำปฏิกิริยากับก๊าซออกซิเจนเลย"], a: 0, exp: "ทังสเตนมีความต้านทานสูง เมื่อไฟผ่านจะเกิดความร้อนจนเปล่งแสง และมีจุดหลอมเหลวสูงมากทำให้ไส้หลอดไม่ขาดง่าย" },
+  { cat: "แรงและพลังงาน", q: "การที่เรานั่งอยู่ข้างกองไฟแล้วรู้สึกร้อน โดยที่ไม่ได้สัมผัสกับเปลวไฟ เป็นการถ่ายโอนความร้อนด้วยวิธีใด?", choices: ["การแผ่รังสีความร้อน", "การนำความร้อน", "การพาความร้อน", "การดูดกลืนความร้อน"], a: 0, exp: "การแผ่รังสีความร้อน (Radiation) เป็นการถ่ายโอนความร้อนโดยไม่ต้องอาศัยตัวกลาง เช่น รังสีจากกองไฟ หรือจากดวงอาทิตย์" },
+  { cat: "แรงและพลังงาน", q: "หากเราส่อง 'แสงสีเขียว' ลงบนลูกแอปเปิลที่มีสีแดง เราจะมองเห็นลูกแอปเปิลเป็นสีอะไร?", choices: ["สีดำ", "สีแดง", "สีเขียว", "สีเหลือง"], a: 0, exp: "วัตถุสีแดงจะสะท้อนเฉพาะแสงสีแดง เมื่อเราฉายแสงสีเขียว (ซึ่งไม่มีสีแดงผสมอยู่) วัตถุจะดูดกลืนแสงเขียวไว้หมด ทำให้ไม่มีแสงสะท้อนเข้าตาเรา จึงเห็นเป็นสีดำ" },
+  { cat: "ดาราศาสตร์และอวกาศ", q: "ปรากฏการณ์สุริยุปราคา เกิดจากการเรียงตัวของดาวดวงใดในลักษณะใด?", choices: ["ดวงอาทิตย์ - ดวงจันทร์ - โลก", "ดวงอาทิตย์ - โลก - ดวงจันทร์", "โลก - ดวงอาทิตย์ - ดวงจันทร์", "ดวงจันทร์ - ดวงอาทิตย์ - โลก"], a: 0, exp: "สุริยุปราคาเกิดจากดวงจันทร์เคลื่อนมาบังแสงจากดวงอาทิตย์ ทำให้เงาของดวงจันทร์ตกลงบนโลก (ดวงจันทร์อยู่ตรงกลาง)" },
+  { cat: "ดาราศาสตร์และอวกาศ", q: "ปรากฏการณ์ 'น้ำเกิด' (ระดับน้ำทะเลขึ้นสูงสุดและลงต่ำสุด) จะเกิดขึ้นในช่วงวันใด?", choices: ["วันพระจันทร์เต็มดวง และวันเดือนมืด", "วันขึ้น 8 ค่ำ", "วันแรม 8 ค่ำ", "ช่วงที่โลกอยู่ใกล้ดวงอาทิตย์ที่สุดในรอบปี"], a: 0, exp: "น้ำเกิด (Spring tide) เกิดเมื่อดวงอาทิตย์ โลก และดวงจันทร์ โคจรมาอยู่ในแนวเส้นตรงเดียวกัน (ขึ้น 15 ค่ำ และแรม 15 ค่ำ) ทำให้แรงดึงดูดเสริมกัน" },
+  { cat: "ดาราศาสตร์และอวกาศ", q: "ทำไมดาวศุกร์จึงมีอุณหภูมิพื้นผิวร้อนที่สุดในระบบสุริยะ ทั้งที่ไม่ได้อยู่ใกล้ดวงอาทิตย์ที่สุด?", choices: ["เพราะมีชั้นบรรยากาศหนาทึบที่ประกอบด้วยก๊าซคาร์บอนไดออกไซด์ปริมาณมหาศาล", "เพราะมีภูเขาไฟระเบิดตลอดเวลา", "เพราะดาวศุกร์ดูดกลืนแสงอาทิตย์และไม่สะท้อนกลับเลย", "เพราะมีขนาดใหญ่และแกนกลางเป็นเหล็กหลอมเหลว"], a: 0, exp: "ก๊าซคาร์บอนไดออกไซด์ในชั้นบรรยากาศของดาวศุกร์ทำให้เกิดปรากฏการณ์เรือนกระจกอย่างรุนแรง (Runaway Greenhouse Effect) ความร้อนจึงถูกกักเก็บไว้" },
+  { cat: "กระบวนการทางวิทยาศาสตร์", q: "ในการทดลอง 'แสงแดดมีผลต่อการเจริญเติบโตของต้นถั่วหรือไม่' สิ่งใดคือ 'ตัวแปรต้น' (ตัวแปรอิสระ)?", choices: ["ปริมาณแสงแดดที่ต้นถั่วได้รับ", "ความสูงของต้นถั่วที่วัดได้", "ปริมาณน้ำและชนิดของดิน", "ชนิดของเมล็ดถั่วที่นำมาปลูก"], a: 0, exp: "ตัวแปรต้น คือ สิ่งที่เราจงใจจัดให้แตกต่างกันเพื่อดูผลที่ตามมา ในที่นี้คือปริมาณแสงแดด (ส่วนความสูงคือตัวแปรตาม)" },
+  { cat: "วิทยาศาสตร์ในชีวิต", q: "กระบวนการย่อย 'โปรตีน' ในร่างกายมนุษย์ เริ่มต้นขึ้นที่อวัยวะใด?", choices: ["กระเพาะอาหาร", "ปาก", "ลำไส้เล็ก", "ลำไส้ใหญ่"], a: 0, exp: "ที่ปากจะย่อยเฉพาะคาร์โบไฮเดรต(แป้ง) ส่วนโปรตีนจะเริ่มถูกย่อยด้วยน้ำย่อยเพปซินในกระเพาะอาหารเป็นที่แรก" },
+  { cat: "วิทยาศาสตร์ในชีวิต", q: "หลอดเลือดใดทำหน้าที่นำเลือดที่มีปริมาณออกซิเจนสูง ออกจากหัวใจเพื่อไปเลี้ยงส่วนต่างๆ ของร่างกาย?", choices: ["หลอดเลือดอาร์เทอรี (Artery)", "หลอดเลือดเวน (Vein)", "หลอดเลือดฝอย (Capillary)", "ลิ้นหัวใจ"], a: 0, exp: "หลอดเลือดอาร์เทอรี (หรือหลอดเลือดแดง) นำเลือดที่มีออกซิเจนสูงออกจากหัวใจไปทั่วร่างกาย ส่วนหลอดเลือดเวนนำเลือดดำกลับเข้าหัวใจ" },
+  { cat: "โลกและการเปลี่ยนแปลง", q: "นักโบราณคดีมักค้นพบ 'ซากดึกดำบรรพ์ (Fossils)' ในหินประเภทใดมากที่สุด?", choices: ["หินตะกอน (หินชั้น)", "หินอัคนีพุ", "หินอัคนีแทรกซอน", "หินแปร"], a: 0, exp: "หินตะกอนเกิดจากการทับถมของดินโคลนและซากสิ่งมีชีวิตเป็นเวลานาน ทำให้สามารถเก็บรักษาซากดึกดำบรรพ์ไว้ได้โดยไม่ถูกความร้อนหลอมละลาย" },
+  { cat: "โลกและการเปลี่ยนแปลง", q: "ปรากฏการณ์ 'ลมทะเล' (ลมพัดจากทะเลเข้าฝั่ง) เกิดขึ้นในเวลาใด และเกิดจากสาเหตุใด?", choices: ["เกิดตอนกลางวัน เพราะพื้นดินร้อนเร็วกว่าพื้นน้ำ อากาศเหนือพื้นดินจึงลอยตัวสูงขึ้น", "เกิดตอนกลางคืน เพราะพื้นน้ำเย็นเร็วกว่าพื้นดิน", "เกิดตอนกลางวัน เพราะพื้นน้ำดูดซับความร้อนได้ดีกว่าพื้นดิน", "เกิดตอนกลางคืน เพราะมีอิทธิพลจากแรงดึงดูดของดวงจันทร์"], a: 0, exp: "ตอนกลางวัน ดินรับความร้อนได้เร็วกว่าน้ำ อากาศเหนือผิวดินจึงร้อนและลอยตัวขึ้น อากาศเย็นจากผิวน้ำทะเลจึงพัดเข้ามาแทนที่ เรียกว่าลมทะเล" },
+  { cat: "สิ่งมีชีวิตและสิ่งแวดล้อม", q: "พืชใบเลี้ยงคู่และพืชใบเลี้ยงเดี่ยว มีความแตกต่างกันในเรื่องใดที่เห็นได้ชัดเจนที่สุด?", choices: ["ระบบรากและเส้นใบ", "การสังเคราะห์ด้วยแสง", "การสืบพันธุ์แบบไม่อาศัยเพศ", "การตอบสนองต่อแสง"], a: 0, exp: "พืชใบเลี้ยงคู่มีรากแก้วและเส้นใบเป็นร่างแห ส่วนพืชใบเลี้ยงเดี่ยวมีรากฝอยและเส้นใบขนาน (ส่วนการสังเคราะห์ด้วยแสงมีเหมือนกันทั้งคู่)" }
+];
+
+let state = {
+  screen: 'login', // login, quiz, result
+  studentName: '',
+  studentId: '',
+  questions: [], 
+  answers: [], 
+  checked: [], 
+  current: 0
+};
+
+// สุ่ม Array
+function shuffleArray(arr) {
+  let newArr = arr.slice();
+  for (let i = newArr.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    let temp = newArr[i];
+    newArr[i] = newArr[j];
+    newArr[j] = temp;
+  }
+  return newArr;
+}
+
+// เริ่มทำแบบทดสอบ
+function startApp() {
+  const nameInput = document.getElementById('s_name').value;
+  const idInput = document.getElementById('s_id').value;
+  
+  if (nameInput.trim() === '') {
+    alert('กรุณากรอกชื่อ-นามสกุลก่อนเข้าสอบครับ');
+    return;
+  }
+  
+  state.studentName = nameInput;
+  state.studentId = idInput || 'สกร. อำเภอโนนสัง';
+  document.getElementById('subtitle-text').innerText = 'ผู้เข้าสอบ: ' + state.studentName;
+  
+  let shuffledDB = shuffleArray(database);
+  state.questions = [];
+  
+  for (let i = 0; i < shuffledDB.length; i++) {
+    let q = shuffledDB[i];
+    let correctText = q.choices[q.a];
+    let newChoices = shuffleArray(q.choices);
+    let newCorrectIndex = newChoices.indexOf(correctText);
+    
+    state.questions.push({
+      cat: q.cat,
+      q: q.q,
+      exp: q.exp,
+      choices: newChoices,
+      correctAnswer: newCorrectIndex
+    });
+  }
+  
+  state.answers = new Array(state.questions.length).fill(null);
+  state.checked = new Array(state.questions.length).fill(false);
+  state.current = 0;
+  state.screen = 'quiz';
+  
+  renderApp();
+}
+
+function renderApp() {
+  const app = document.getElementById('app');
+  if (state.screen === 'login') {
+    app.innerHTML = `
+      <div class="card" style="text-align: center; padding: 40px 20px;">
+        <div style="font-size: 60px; margin-bottom: 10px;">🧪</div>
+        <h2 style="color: var(--primary); margin-bottom: 10px;">ข้อมูลผู้เข้าสอบ (ชุดที่ 2)</h2>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px;">ระบบจะสุ่มข้อสอบและสุ่มตัวเลือกใหม่ทุกครั้ง</p>
+        <div class="inp-group">
+          <label class="inp-label">ชื่อ-นามสกุล (บังคับ)</label>
+          <input type="text" id="s_name" class="inp-text" placeholder="ระบุชื่อและนามสกุล">
+        </div>
+        <div class="inp-group">
+          <label class="inp-label">รหัสนักศึกษา / สังกัด</label>
+          <input type="text" id="s_id" class="inp-text" value="สกร. อำเภอโนนสัง">
+        </div>
+        <button class="btn btn-primary" style="margin-top: 10px;" onclick="startApp()">เริ่มทำแบบทดสอบ 🚀</button>
+      </div>
+    `;
+  } 
+  else if (state.screen === 'quiz') {
+    let total = state.questions.length;
+    let curr = state.current;
+    let q = state.questions[curr];
+    let ans = state.answers[curr];
+    let isChecked = state.checked[curr];
+    let pct = Math.round(((curr + 1) / total) * 100);
+    
+    let letters = ['A', 'B', 'C', 'D'];
+    let choicesHTML = '';
+    for (let i = 0; i < 4; i++) {
+      let cssClass = 'choice';
+      if (isChecked) {
+        if (i === q.correctAnswer) cssClass += ' correct';
+        else if (i === ans && ans !== q.correctAnswer) cssClass += ' wrong';
+      } else {
+        if (i === ans) cssClass += ' selected';
+      }
+      
+      let disabledAttr = isChecked ? 'disabled' : '';
+      choicesHTML += `<button class="${cssClass}" ${disabledAttr} onclick="selectAnswer(${i})">
+                        <div class="c-let">${letters[i]}</div>
+                        <div>${q.choices[i]}</div>
+                      </button>`;
+    }
+    
+    let fbHTML = '';
+    if (isChecked) {
+      if (ans === q.correctAnswer) {
+        fbHTML = `<div class="feedback ok">✅ <strong>ถูกต้อง!</strong><div class="fb-explain">💡 ${q.exp}</div></div>`;
+      } else {
+        fbHTML = `<div class="feedback no">❌ <strong>ยังไม่ถูกต้อง</strong> — คำตอบที่ถูกคือ: <strong>${q.choices[q.correctAnswer]}</strong><div class="fb-explain">💡 ${q.exp}</div></div>`;
+      }
+    }
+    
+    let navHTML = '';
+    let btnPrev = curr > 0 ? `<button class="btn btn-secondary" onclick="goPrev()">← ย้อนกลับ</button>` : `<div style="width:48%"></div>`;
+    let btnNext = '';
+    
+    if (isChecked) {
+      if (curr === total - 1) {
+        btnNext = `<button class="btn btn-primary" onclick="showResult()">ประมวลผลคะแนน 🏆</button>`;
+      } else {
+        btnNext = `<button class="btn btn-primary" onclick="goNext()">ถัดไป →</button>`;
+      }
+    } else {
+      let dis = ans === null ? 'disabled' : '';
+      btnNext = `<button class="btn btn-primary" ${dis} onclick="checkAnswer()">ตรวจคำตอบ ✓</button>`;
+    }
+    navHTML = `<div class="nav-buttons">${btnPrev}${btnNext}</div>`;
+    
+    let dotsHTML = '<div class="dot-nav">';
+    for (let i = 0; i < total; i++) {
+      let dClass = 'dot';
+      if (i === curr) dClass += ' active';
+      else if (state.checked[i]) {
+        dClass += (state.answers[i] === state.questions[i].correctAnswer) ? ' ok' : ' no';
+      }
+      dotsHTML += `<button class="${dClass}" onclick="jumpTo(${i})">${i+1}</button>`;
+    }
+    dotsHTML += '</div>';
+
+    app.innerHTML = `
+      <div class="card" style="padding: 16px 20px;">
+        <div class="prog-text">
+          <span>ข้อที่ ${curr + 1} จาก ${total}</span>
+          <span>ตอบแล้ว ${state.answers.filter(a => a !== null).length} ข้อ</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" style="width: ${pct}%"></div></div>
+      </div>
+      
+      <div class="card">
+        <div class="q-badge">${q.cat}</div>
+        <div class="q-text"><span class="q-num-circle">${curr + 1}</span> ${q.q}</div>
+        <div class="choices">${choicesHTML}</div>
+        ${fbHTML}
+        ${navHTML}
+      </div>
+      ${dotsHTML}
+    `;
+  }
+  else if (state.screen === 'result') {
+    let total = state.questions.length;
+    let score = 0;
+    let categoryStats = {};
+    
+    for (let i = 0; i < total; i++) {
+      let q = state.questions[i];
+      if (!categoryStats[q.cat]) categoryStats[q.cat] = { t: 0, c: 0 };
+      categoryStats[q.cat].t++;
+      
+      if (state.answers[i] === q.correctAnswer) {
+        score++;
+        categoryStats[q.cat].c++;
+      }
+    }
+    
+    let pct = Math.round((score / total) * 100);
+    let grade = '', gClass = '', msg = '';
+    
+    if (pct >= 80) { grade = 'ดีมาก (A)'; gClass = 'grade-A'; msg = 'ยอดเยี่ยม! ทักษะการวิเคราะห์วิทยาศาสตร์คุณดีมาก'; }
+    else if (pct >= 60) { grade = 'ดี (B)'; gClass = 'grade-B'; msg = 'ทำได้ดีมากครับ ตอบคำถามเชิงประยุกต์ได้ดี'; }
+    else if (pct >= 50) { grade = 'พอใช้ (C)'; gClass = 'grade-C'; msg = 'ผ่านเกณฑ์แล้ว แต่อาจต้องทบทวนหลักการเชิงลึกอีกนิด'; }
+    else { grade = 'ต้องปรับปรุง (D)'; gClass = 'grade-D'; msg = 'ข้อสอบชุดนี้มีความซับซ้อนขึ้น ลองอ่านเฉลยและสู้ใหม่อีกครั้งนะครับ'; }
+    
+    let weak = [];
+    for (let cat in categoryStats) {
+      if (categoryStats[cat].t > 0 && (categoryStats[cat].c / categoryStats[cat].t) <= 0.5) {
+        weak.push(cat);
+      }
+    }
+    
+    let fbMsg = weak.length > 0 
+      ? `📉 <strong>ระบบวิเคราะห์จุดอ่อน:</strong> คุณมีข้อผิดพลาดบ่อยในสาระ <strong>${weak.join(' และ ')}</strong> แนะนำให้ทบทวนเนื้อหาส่วนนี้เพิ่มเติมครับ`
+      : `✨ <strong>ระบบวิเคราะห์:</strong> เก่งมากครับ! คุณสามารถประยุกต์ความรู้วิทยาศาสตร์ผ่านเกณฑ์ในทุกสาระการเรียนรู้`;
+
+    let today = new Date();
+    let dateString = today.getDate() + '/' + (today.getMonth()+1) + '/' + (today.getFullYear()+543);
+
+    let reviewHTML = '<div class="card" style="margin-top:20px"><div class="review-title">📋 ตรวจสอบคำตอบอย่างละเอียด (ชุดที่ 2)</div>';
+    for (let i = 0; i < total; i++) {
+      let q = state.questions[i];
+      let isCorr = (state.answers[i] === q.correctAnswer);
+      let userText = state.answers[i] !== null ? q.choices[state.answers[i]] : '(ไม่ได้ตอบ)';
+      let icon = isCorr ? '✓' : '✗';
+      let iconCls = isCorr ? 'ri-ok' : 'ri-no';
+      
+      reviewHTML += `
+        <div class="review-item">
+          <div class="r-q"><span class="ri-tick ${iconCls}">${icon}</span> ข้อ ${i+1}: ${q.q}</div>
+          <div class="r-a" style="color:var(--text-muted)">คุณตอบ: ${userText}</div>
+          <div class="r-a" style="color:var(--green); font-weight:600;">เฉลย: ${q.choices[q.correctAnswer]}</div>
+          <div class="r-exp">💡 ${q.exp}</div>
+        </div>
+      `;
+    }
+    reviewHTML += '</div>';
+
+    app.innerHTML = `
+      <div class="card" style="text-align:center; padding:32px 20px;">
+        <div class="cert-header">รายงานผลการทดสอบวิทยาศาสตร์ (ชุดที่ 2)</div>
+        <div class="cert-name">คุณ ${state.studentName}</div>
+        <div class="cert-meta">รหัส/สังกัด: ${state.studentId} | วันที่สอบ: ${dateString}</div>
+        
+        <div style="font-size:60px; margin: 10px 0;">${pct >= 50 ? '🏆' : '📖'}</div>
+        <div class="score-big">${score}</div>
+        <div class="score-denom">จาก ${total} ข้อ (${pct}%)</div>
+        <div style="margin: 16px 0;"><span class="grade-pill ${gClass}">${grade}</span></div>
+        <div style="color:var(--text-muted); margin-bottom: 24px;">${msg}</div>
+        
+        <div class="feedback-box">${fbMsg}</div>
+        
+        <div class="grid-stats">
+          <div class="stat-box"><div class="stat-num" style="color:var(--green)">${score}</div><div class="slbl">ตอบถูก</div></div>
+          <div class="stat-box"><div class="stat-num" style="color:var(--red)">${total - score}</div><div class="slbl">ตอบผิด</div></div>
+          <div class="stat-box"><div class="stat-num" style="color:var(--primary)">${pct}%</div><div class="slbl">คะแนน</div></div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="location.reload()">🔄 ทำแบบทดสอบชุดที่ 2 อีกครั้ง</button>
+      </div>
+      ${reviewHTML}
+    `;
+  }
+}
+
+function selectAnswer(index) {
+  if (state.checked[state.current]) return;
+  state.answers[state.current] = index;
+  renderApp();
+}
+
+function checkAnswer() {
+  if (state.answers[state.current] === null) return;
+  state.checked[state.current] = true;
+  renderApp();
+}
+
+function goNext() {
+  if (state.current < state.questions.length - 1) {
+    state.current++;
+    renderApp();
+  }
+}
+
+function goPrev() {
+  if (state.current > 0) {
+    state.current--;
+    renderApp();
+  }
+}
+
+function jumpTo(index) {
+  state.current = index;
+  renderApp();
+}
+
+function showResult() {
+  state.screen = 'result';
+  renderApp();
+}
+
+// Initial Call
+renderApp();
+</script>
+</body>
+</html>
