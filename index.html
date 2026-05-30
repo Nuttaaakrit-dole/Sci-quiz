@@ -9,31 +9,332 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --primary: #00796b; --primary-dark: #004d40; --primary-light: #e0f2f1;
-    --green: #3B6D11; --green-light: #EAF3DE;
-    --red: #A32D2D; --red-light: #FCEBEB;
+    --green: #3B6D11; --green-light: #EAF3DE; --green-mid: #97C459;
+    --red: #A32D2D; --red-light: #FCEBEB; --red-mid: #F09595;
+    --amber-light: #FAEEDA; --amber: #633806;
     --gray-bg: #f5f4f0; --gray-card: #fff; --gray-border: #e0e0e0;
     --text: #1a1a1a; --text-muted: #666;
   }
   body { font-family: 'Sarabun', sans-serif; background: var(--gray-bg); color: var(--text); padding-bottom: 40px; }
   .container { max-width: 680px; margin: 0 auto; padding: 16px; }
-  
-  .header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 16px; padding: 24px; color: #fff; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+  /* Header */
+  .header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 16px; padding: 24px; color: #fff; margin-bottom: 16px; position: relative; overflow: hidden; }
+  .header::before { content:''; position:absolute; top:-30px; right:-30px; width:120px; height:120px; border-radius:50%; background:rgba(255,255,255,0.07); }
   .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
   .title { font-size: 22px; font-weight: 700; margin-bottom: 5px; line-height: 1.4; }
   .subtitle { font-size: 14px; opacity: 0.9; }
 
-  .card { background: var(--gray-card); border-radius: 16px; padding: 24px; border: 1px solid var(--gray-border); margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-  
+  /* Card */
+  .card { background: var(--gray-card); border-radius: 16px; padding: 24px; border: 1px solid var(--gray-border); margin-bottom: 16px; }
+
+  /* Login */
   .inp-group { margin-bottom: 16px; text-align: left; }
   .inp-label { display: block; font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
   .inp-text { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--gray-border); font-family: 'Sarabun', sans-serif; font-size: 16px; background: #fafafa; }
-  
+
+  /* Buttons */
   .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-family: 'Sarabun', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
   .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); }
   .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn-secondary { background: #e0e0e0; color: var(--text); width: 48%; }
-  
   .nav-buttons { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
+  .nav-buttons .btn-primary { width: 48%; }
+
+  /* Progress */
+  .prog-text { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .prog-bar { background: #eee; height: 10px; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  .prog-fill { background: var(--primary); height: 100%; width: 0%; transition: 0.3s; }
+
+  /* Question */
+  .q-badge { font-size: 12px; color: var(--primary); font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .q-num-circle { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: var(--primary-light); color: var(--primary-dark); font-size: 13px; font-weight: 700; margin-right: 8px; vertical-align: middle; flex-shrink: 0; }
+  .q-text { font-size: 18px; font-weight: 600; margin-bottom: 20px; line-height: 1.6; display: flex; align-items: flex-start; gap: 4px; }
+
+  /* Choices */
+  .choice { display: flex; align-items: center; background: #fff; border: 2px solid var(--gray-border); padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-size: 15px; font-family: 'Sarabun', sans-serif; text-align: left; transition: 0.2s; width: 100%; }
+  .choice:hover:not(:disabled) { border-color: var(--primary); background: var(--primary-light); }
+  .choice.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); font-weight: 600; }
+  .choice.correct { border-color: var(--green); background: var(--green-light); color: var(--green); font-weight: 600; }
+  .choice.wrong { border-color: var(--red); background: var(--red-light); color: var(--red); font-weight: 600; }
+  .choice:disabled { cursor: not-allowed; }
+  .c-let { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 50%; margin-right: 12px; font-weight: 700; font-size: 13px; flex-shrink: 0; transition: 0.2s; }
+  .choice.selected .c-let { background: var(--primary); color: #fff; }
+  .choice.correct .c-let { background: var(--green); color: #fff; }
+  .choice.wrong .c-let { background: var(--red); color: #fff; }
+
+  /* Feedback inline */
+  .feedback { padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6; margin-top: 16px; }
+  .feedback.ok { background: var(--green-light); border: 1px solid var(--green-mid); color: #1f3a09; }
+  .feedback.no { background: var(--red-light); border: 1px solid var(--red-mid); color: #521717; }
+  .fb-explain { display: block; margin-top: 6px; font-size: 13px; opacity: 0.85; }
+
+  /* Dot nav */
+  .dot-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; justify-content: center; }
+  .dot { width: 32px; height: 32px; border-radius: 8px; border: none; font-family: 'Sarabun', sans-serif; font-weight: 600; font-size: 12px; cursor: pointer; background: #e0e0e0; color: var(--text); transition: 0.15s; }
+  .dot.active { background: var(--primary); color: #fff; transform: scale(1.1); }
+  .dot.ok { background: var(--green); color: #fff; }
+  .dot.no { background: var(--red); color: #fff; }
+
+  /* ===== RESULT SCREEN CSS (ส่วนที่ขาดหายไป) ===== */
+
+  /* Certificate / result header */
+  .cert-header { font-size: 16px; font-weight: 700; color: var(--primary-dark); margin-bottom: 6px; }
+  .cert-name { font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .cert-meta { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+
+  /* Big score */
+  .score-big { font-size: 56px; font-weight: 700; color: var(--primary); line-height: 1; }
+  .score-denom { font-size: 20px; color: var(--text-muted); margin-bottom: 8px; }
+
+  /* Grade pill */
+  .grade-pill { display: inline-block; padding: 5px 20px; border-radius: 99px; font-size: 14px; font-weight: 700; }
+  .grade-A { background: var(--green-light); color: var(--green); }
+  .grade-B { background: var(--primary-light); color: var(--primary-dark); }
+  .grade-C { background: var(--amber-light); color: var(--amber); }
+  .grade-D { background: var(--red-light); color: var(--red); }
+
+  /* Feedback analysis box */
+  .feedback-box { background: var(--primary-light); border: 1px solid #80cbc4; border-radius: 12px; padding: 14px 16px; font-size: 14px; line-height: 1.7; color: var(--primary-dark); margin-bottom: 20px; text-align: left; }
+
+  /* Stat grid */
+  .grid-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
+  .stat-box { background: #f9f9f9; padding: 16px 10px; border-radius: 12px; text-align: center; border: 1px solid var(--gray-border); }
+  .stat-num { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .slbl { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Review section */
+  .review-title { font-size: 17px; font-weight: 700; padding-bottom: 12px; border-bottom: 1px solid var(--gray-border); margin-bottom: 14px; }
+  .review-item { padding: 14px 0; border-bottom: 1px solid var(--gray-border); text-align: left; }
+  .review-item:last-child { border-bottom: none; }
+  .r-q { font-size: 15px; font-weight: 600; margin-bottom: 8px; line-height: 1.5; display: flex; gap: 8px; align-items: flex-start; }
+  .r-a { font-size: 14px; margin-bottom: 4px; }
+  .r-exp { font-size: 13px; color: var(--text-muted); background: #f5f5f5; padding: 10px; border-radius: 8px; margin-top: 8px; line-height: 1.6; }
+
+  /* Review tick badges */
+  .ri-tick { width: 20px; height: 20px; border-radius: 50%; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .ri-ok { background: var(--green-light); color: var(--green); }
+  .ri-no { background: var(--red-light); color: var(--red); }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="badge">N-NET • สกร. อำเภอโนนสัง</div>
+    <div class="title">🔬 แบบทดสอบวิทยาศาสตร์</div>
+    <div class="subtitle" id="subtitle-text">ระบบสุ่มข้อสอบและวิเคราะห์ผลรายบุคคล</div>
+  </div>
+  <div id="app"></div>
+</div>
+
+<script>
+const database = [
+  { cat: "สิ่งมีชีวิตและสิ่งแวดล้อม", q: "ส่วนประกอบใดของเซลล์พืชที่ทำหน้าที่สร้างอาหาร?", choices: ["คลอโรพลาสต์", "นิวเคลียส", "ผนังเซลล์", "ไซโทพลาซึม"], a: 0, exp: "คลอโรพลาสต์มีสารคลอโรฟิลล์สีเขียวที่ใช้ดักจับแสงเพื่อใช้ในการสังเคราะห์ด้วยแสง" },
+  { cat: "สิ่งมีชีวิตและสิ่งแวดล้อม", q: "ผู้ผลิต (Producer) ในห่วงโซ่อาหารมักจะเป็นสิ่งมีชีวิตกลุ่มใด?", choices: ["พืชสีเขียว", "สัตว์กินพืช", "สัตว์กินเนื้อ", "ผู้ย่อยสลาย"], a: 0, exp: "พืชสีเขียวสามารถสร้างอาหารเองได้ จึงเป็นผู้ผลิตและเป็นจุดเริ่มต้นของห่วงโซ่อาหารเสมอ" },
+  { cat: "สิ่งมีชีวิตและสิ่งแวดล้อม", q: "สัตว์ในข้อใดจัดเป็นสัตว์เลือดอุ่นทั้งหมด?", choices: ["โลมา, นกพิราบ", "กบ, งูเห่า", "ฉลาม, จระเข้", "ค้างคาว, เต่า"], a: 0, exp: "สัตว์เลี้ยงลูกด้วยนม (โลมา) และสัตว์ปีก (นก) เป็นสัตว์เลือดอุ่น" },
+  { cat: "สิ่งแวดล้อมและทรัพยากร", q: "ก๊าซใดเป็นสาเหตุหลักของปรากฏการณ์เรือนกระจกที่เกิดจากกิจกรรมมนุษย์?", choices: ["คาร์บอนไดออกไซด์", "ออกซิเจน", "ไนโตรเจน", "อาร์กอน"], a: 0, exp: "คาร์บอนไดออกไซด์จากการเผาไหม้ เป็นก๊าซเรือนกระจกที่สะสมในบรรยากาศมากที่สุด" },
+  { cat: "สิ่งแวดล้อมและทรัพยากร", q: "การทิ้งถ่านไฟฉายและแบตเตอรี่ ควรทิ้งลงในถังขยะสีใด?", choices: ["สีแดง (ขยะอันตราย)", "สีเหลือง (ขยะรีไซเคิล)", "สีเขียว (ขยะเปียก)", "สีน้ำเงิน (ขยะทั่วไป)"], a: 0, exp: "แบตเตอรี่และถ่านไฟฉายมีสารเคมีโลหะหนัก จัดเป็นขยะอันตราย (ถังสีแดง)" },
+  { cat: "สารและสมบัติของสาร", q: "การที่น้ำแข็งเปลี่ยนสถานะเป็นน้ำเหลว เรียกว่ากระบวนการใด?", choices: ["การหลอมเหลว", "การกลายเป็นไอ", "การควบแน่น", "การระเหิด"], a: 0, exp: "ของแข็งเปลี่ยนเป็นของเหลวเรียกว่า การหลอมเหลว (Melting)" },
+  { cat: "สารและสมบัติของสาร", q: "ข้อใดคือการเปลี่ยนแปลงทางเคมี?", choices: ["การเกิดสนิมของเหล็ก", "การละลายน้ำตาลในน้ำ", "การฉีกกระดาษเป็นชิ้นเล็กๆ", "การต้มน้ำจนเดือด"], a: 0, exp: "การเกิดสนิมทำให้เกิดสารใหม่ที่มีสมบัติต่างไปจากเหล็กเดิม เป็นการเปลี่ยนแปลงทางเคมี" },
+  { cat: "สารและสมบัติของสาร", q: "วัสดุในข้อใดเป็น 'ฉนวนไฟฟ้า' ทั้งหมด?", choices: ["ยาง, พลาสติก", "ทองแดง, อะลูมิเนียม", "เหล็ก, ไม้แห้ง", "เงิน, แก้ว"], a: 0, exp: "ยางและพลาสติกไม่ยอมให้กระแสไฟฟ้าไหลผ่าน จึงทำหน้าที่เป็นฉนวนไฟฟ้าที่ดี" },
+  { cat: "แรงและพลังงาน", q: "แรงดึงดูดของโลกที่กระทำต่อมวลของวัตถุ ทำให้เกิดสิ่งใด?", choices: ["น้ำหนัก", "ความหนาแน่น", "ปริมาตร", "ความเสียดทาน"], a: 0, exp: "น้ำหนัก คือผลคูณระหว่างมวลของวัตถุกับแรงโน้มถ่วงที่โลกดึงดูดวัตถุนั้น" },
+  { cat: "แรงและพลังงาน", q: "เพื่อลดแรงเสียดทานในการเคลื่อนย้ายตู้เสื้อผ้าขนาดใหญ่ ควรทำอย่างไร?", choices: ["ติดล้อที่ฐานตู้", "เพิ่มน้ำหนักในตู้", "ใช้เชือกเส้นใหญ่ขึ้นดึง", "ผลักตู้บนพื้นพรม"], a: 0, exp: "การใช้ล้อช่วยเปลี่ยนแรงเสียดทานเลื่อนเป็นแรงเสียดทานกลิ้ง ซึ่งมีค่าน้อยกว่า" },
+  { cat: "แรงและพลังงาน", q: "เมื่อแสงเดินทางผ่านตัวกลางที่ต่างชนิดกัน จะเกิดปรากฏการณ์ใดบริเวณรอยต่อ?", choices: ["การหักเหของแสง", "การสะท้อนกลับหมด", "การแทรกสอด", "การเลี้ยวเบน"], a: 0, exp: "เมื่อแสงผ่านตัวกลางที่มีความหนาแน่นต่างกัน ความเร็วแสงจะเปลี่ยน ทำให้เกิดการหักเห" },
+  { cat: "แรงและพลังงาน", q: "ข้อใดเป็นแหล่งกำเนิดพลังงานหมุนเวียนทั้งหมด?", choices: ["แสงอาทิตย์, ลม", "ถ่านหิน, น้ำมัน", "ก๊าซธรรมชาติ, ชีวมวล", "นิวเคลียร์, ถ่านหิน"], a: 0, exp: "แสงอาทิตย์ ลม และน้ำ เป็นพลังงานหมุนเวียน (ใช้แล้วไม่หมดไป)" },
+  { cat: "แรงและพลังงาน", q: "วงจรไฟฟ้าภายในบ้านควรต่อแบบใด เพื่อไม่ให้เครื่องใช้ไฟฟ้าอื่นดับเมื่อมีเครื่องหนึ่งเสีย?", choices: ["แบบขนาน", "แบบอนุกรม", "แบบผสม", "แบบใดก็ได้"], a: 0, exp: "การต่อแบบขนานทำให้กระแสไฟฟ้ามีทางเดินหลายทาง หากอุปกรณ์ใดพัง ทางอื่นก็ยังมีกระแสไหลผ่านได้" },
+  { cat: "ดาราศาสตร์และอวกาศ", q: "ปรากฏการณ์กลางวันและกลางคืน เกิดจากสาเหตุใด?", choices: ["โลกหมุนรอบตัวเอง", "โลกโคจรรอบดวงอาทิตย์", "ดวงจันทร์หมุนรอบโลก", "แกนโลกเอียง"], a: 0, exp: "การที่โลกหมุนรอบตัวเอง 1 รอบ ทำให้ด้านที่หันรับแสงอาทิตย์เป็นกลางวัน ด้านตรงข้ามเป็นกลางคืน" },
+  { cat: "ดาราศาสตร์และอวกาศ", q: "ฤดูกาลต่างๆ บนโลก เกิดขึ้นจากสาเหตุใดเป็นหลัก?", choices: ["แกนโลกเอียงและโคจรรอบดวงอาทิตย์", "โลกหมุนรอบตัวเองช้าลง", "ระยะห่างจากดวงจันทร์", "ปริมาณเมฆในชั้นบรรยากาศ"], a: 0, exp: "การที่แกนโลกเอียงขณะโคจรรอบดวงอาทิตย์ ทำให้แต่ละพื้นที่ได้รับแสงแดดต่างกัน เกิดเป็นฤดูกาล" },
+  { cat: "ดาราศาสตร์และอวกาศ", q: "ดาวเคราะห์ดวงใดในระบบสุริยะที่มีขนาดใหญ่ที่สุด?", choices: ["ดาวพฤหัสบดี", "ดาวเสาร์", "โลก", "ดาวศุกร์"], a: 0, exp: "ดาวพฤหัสบดี เป็นดาวเคราะห์แก๊สยักษ์ที่มีขนาดใหญ่ที่สุดในระบบสุริยะ" },
+  { cat: "กระบวนการทางวิทยาศาสตร์", q: "ข้อใดคือขั้นตอนแรกสุดของกระบวนการทางวิทยาศาสตร์?", choices: ["การสังเกตและระบุปัญหา", "การตั้งสมมติฐาน", "การทดลอง", "การรวบรวมข้อมูล"], a: 0, exp: "วิทยาศาสตร์เริ่มต้นจากการสังเกตปรากฏการณ์ และการตั้งปัญหาที่ต้องการหาคำตอบ" },
+  { cat: "วิทยาศาสตร์ในชีวิต", q: "อาหารในกลุ่มใดที่ให้ 'พลังงาน' แก่ร่างกายเป็นหลัก?", choices: ["คาร์โบไฮเดรตและไขมัน", "โปรตีนและวิตามิน", "เกลือแร่และน้ำ", "วิตามินและแร่ธาตุ"], a: 0, exp: "คาร์โบไฮเดรตและไขมัน เป็นสารอาหารหลักที่ให้พลังงานแก่ร่างกาย" },
+  { cat: "สารและสมบัติของสาร", q: "สารในข้อใดมีสถานะเป็น 'ก๊าซ' ทั้งหมดที่อุณหภูมิห้อง?", choices: ["ออกซิเจน, คาร์บอนไดออกไซด์", "น้ำ, ไฮโดรเจน", "ปรอท, ไนโตรเจน", "เหล็ก, ฮีเลียม"], a: 0, exp: "ออกซิเจนและคาร์บอนไดออกไซด์เป็นก๊าซ (ตัวลวง: น้ำและปรอทเป็นของเหลว)" },
+  { cat: "สิ่งแวดล้อมและทรัพยากร", q: "วิธีการใดช่วยลดปัญหาภาวะโลกร้อนได้ดีที่สุดด้วยตนเอง?", choices: ["ลดการใช้ถุงพลาสติกและปลูกต้นไม้", "เปิดแอร์ 20 องศา", "เผาขยะหลังบ้าน", "ขับรถยนต์ส่วนตัว"], a: 0, exp: "การลดพลาสติกและการปลูกต้นไม้ช่วยลดและดูดซับก๊าซคาร์บอนไดออกไซด์ได้โดยตรง" }
+];
+
+let state = {
+  screen: 'login',
+  studentName: '', studentId: '',
+  questions: [], answers: [], checked: [], current: 0
+};
+
+function shuffleArray(arr) {
+  let a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startApp() {
+  const name = document.getElementById('s_name').value.trim();
+  if (!name) { alert('กรุณากรอกชื่อ-นามสกุลก่อนเข้าสอบครับ'); return; }
+  state.studentName = name;
+  state.studentId = document.getElementById('s_id').value || 'สกร. อำเภอโนนสัง';
+  document.getElementById('subtitle-text').innerText = 'ผู้เข้าสอบ: ' + state.studentName;
+
+  let shuffledDB = shuffleArray(database);
+  state.questions = shuffledDB.map(q => {
+    let correctText = q.choices[q.a];
+    let newChoices = shuffleArray(q.choices);
+    return { cat: q.cat, q: q.q, exp: q.exp, choices: newChoices, correctAnswer: newChoices.indexOf(correctText) };
+  });
+
+  state.answers = new Array(state.questions.length).fill(null);
+  state.checked = new Array(state.questions.length).fill(false);
+  state.current = 0;
+  state.screen = 'quiz';
+  renderApp();
+}
+
+function renderApp() {
+  const app = document.getElementById('app');
+  if (state.screen === 'login') { app.innerHTML = loginHTML(); return; }
+  if (state.screen === 'quiz')  { app.innerHTML = quizHTML();  return; }
+  if (state.screen === 'result') { app.innerHTML = resultHTML(); return; }
+}
+
+function loginHTML() {
+  return `<div class="card" style="text-align:center;padding:40px 20px;">
+    <div style="font-size:60px;margin-bottom:10px;">👨🏻‍🔬</div>
+    <h2 style="color:var(--primary);margin-bottom:10px;">ข้อมูลผู้เข้าสอบ</h2>
+    <p style="color:var(--text-muted);font-size:14px;margin-bottom:24px;">ระบบจะสุ่มข้อสอบและสุ่มตัวเลือกใหม่ทุกครั้ง</p>
+    <div class="inp-group">
+      <label class="inp-label">ชื่อ-นามสกุล (บังคับ)</label>
+      <input type="text" id="s_name" class="inp-text" placeholder="ระบุชื่อและนามสกุล">
+    </div>
+    <div class="inp-group">
+      <label class="inp-label">รหัสนักศึกษา / สังกัด</label>
+      <input type="text" id="s_id" class="inp-text" value="สกร. อำเภอโนนสัง">
+    </div>
+    <button class="btn btn-primary" style="margin-top:10px;" onclick="startApp()">เริ่มทำแบบทดสอบ 🚀</button>
+  </div>`;
+}
+
+function quizHTML() {
+  const total = state.questions.length, curr = state.current;
+  const q = state.questions[curr];
+  const ans = state.answers[curr], isChecked = state.checked[curr];
+  const pct = Math.round(((curr + 1) / total) * 100);
+  const L = ['A','B','C','D'];
+
+  let choicesHTML = q.choices.map((c, i) => {
+    let cls = 'choice';
+    if (isChecked) { if (i === q.correctAnswer) cls += ' correct'; else if (i === ans) cls += ' wrong'; }
+    else if (i === ans) cls += ' selected';
+    return `<button class="${cls}" ${isChecked ? 'disabled' : ''} onclick="selectAnswer(${i})">
+      <div class="c-let">${L[i]}</div><div>${c}</div></button>`;
+  }).join('');
+
+  let fbHTML = '';
+  if (isChecked) {
+    fbHTML = ans === q.correctAnswer
+      ? `<div class="feedback ok">✅ <strong>ถูกต้อง!</strong><span class="fb-explain">💡 ${q.exp}</span></div>`
+      : `<div class="feedback no">❌ <strong>ยังไม่ถูกต้อง</strong> — คำตอบที่ถูกคือ: <strong>${q.choices[q.correctAnswer]}</strong><span class="fb-explain">💡 ${q.exp}</span></div>`;
+  }
+
+  const navLeft = curr > 0 ? `<button class="btn btn-secondary" onclick="goPrev()">← ย้อนกลับ</button>` : `<div style="width:48%"></div>`;
+  let navRight = '';
+  if (isChecked) {
+    navRight = curr === total - 1
+      ? `<button class="btn btn-primary" onclick="showResult()">ประมวลผลคะแนน 🏆</button>`
+      : `<button class="btn btn-primary" onclick="goNext()">ถัดไป →</button>`;
+  } else {
+    navRight = `<button class="btn btn-primary" ${ans === null ? 'disabled' : ''} onclick="checkAnswer()">ตรวจคำตอบ ✓</button>`;
+  }
+
+  const dots = state.questions.map((_, i) => {
+    let cls = 'dot' + (i === curr ? ' active' : state.checked[i] ? (state.answers[i] === state.questions[i].correctAnswer ? ' ok' : ' no') : '');
+    return `<button class="${cls}" onclick="jumpTo(${i})">${i+1}</button>`;
+  }).join('');
+
+  return `
+    <div class="card" style="padding:16px 20px;">
+      <div class="prog-text"><span>ข้อที่ ${curr+1} จาก ${total}</span><span>ตอบแล้ว ${state.answers.filter(a=>a!==null).length} ข้อ</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="card">
+      <div class="q-badge">${q.cat}</div>
+      <div class="q-text"><span class="q-num-circle">${curr+1}</span>${q.q}</div>
+      <div>${choicesHTML}</div>
+      ${fbHTML}
+      <div class="nav-buttons">${navLeft}${navRight}</div>
+    </div>
+    <div class="dot-nav">${dots}</div>`;
+}
+
+function resultHTML() {
+  const total = state.questions.length;
+  let score = 0, catStats = {};
+
+  state.questions.forEach((q, i) => {
+    if (!catStats[q.cat]) catStats[q.cat] = { t: 0, c: 0 };
+    catStats[q.cat].t++;
+    if (state.answers[i] === q.correctAnswer) { score++; catStats[q.cat].c++; }
+  });
+
+  const pct = Math.round((score / total) * 100);
+  let grade, gc, msg;
+  if (pct >= 80) { grade='ดีมาก (A)'; gc='grade-A'; msg='ยอดเยี่ยม! พื้นฐานวิทยาศาสตร์แน่นมาก'; }
+  else if (pct >= 60) { grade='ดี (B)'; gc='grade-B'; msg='ทำได้ดีครับ มีความเข้าใจในเกณฑ์มาตรฐาน'; }
+  else if (pct >= 50) { grade='พอใช้ (C)'; gc='grade-C'; msg='ผ่านเกณฑ์ขั้นต่ำ ควรศึกษาทบทวนเพิ่มเติม'; }
+  else { grade='ต้องปรับปรุง (D)'; gc='grade-D'; msg='ไม่เป็นไรครับ ลองอ่านคำอธิบายและทำใหม่อีกครั้งนะ'; }
+
+  const weak = Object.entries(catStats).filter(([,v]) => v.t > 0 && v.c/v.t <= 0.5).map(([k]) => k);
+  const fbMsg = weak.length > 0
+    ? `📉 <strong>ระบบวิเคราะห์จุดอ่อน:</strong> มีข้อผิดพลาดบ่อยในสาระ <strong>${weak.join(' และ ')}</strong> แนะนำให้ทบทวนเนื้อหาส่วนนี้เพิ่มเติม`
+    : `✨ <strong>ระบบวิเคราะห์:</strong> ยอดเยี่ยมมาก! ไม่มีจุดอ่อนที่น่ากังวลในสาระใดเลย`;
+
+  const today = new Date();
+  const dateStr = `${today.getDate()}/${today.getMonth()+1}/${today.getFullYear()+543}`;
+
+  const review = state.questions.map((q, i) => {
+    const ok = state.answers[i] === q.correctAnswer;
+    const ua = state.answers[i] !== null ? q.choices[state.answers[i]] : '(ไม่ได้ตอบ)';
+    return `<div class="review-item">
+      <div class="r-q"><span class="ri-tick ${ok?'ri-ok':'ri-no'}">${ok?'✓':'✗'}</span>ข้อ ${i+1}: ${q.q}</div>
+      <div class="r-a" style="color:var(--text-muted)">คุณตอบ: ${ua}</div>
+      <div class="r-a" style="color:var(--green);font-weight:600;">เฉลย: ${q.choices[q.correctAnswer]}</div>
+      <div class="r-exp">💡 ${q.exp}</div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="card" style="text-align:center;padding:32px 20px;">
+      <div class="cert-header">รายงานผลการทดสอบวิทยาศาสตร์</div>
+      <div class="cert-name">คุณ ${state.studentName}</div>
+      <div class="cert-meta">รหัส/สังกัด: ${state.studentId} | วันที่สอบ: ${dateStr}</div>
+      <div style="font-size:60px;margin:10px 0;">${pct >= 50 ? '🏆' : '📖'}</div>
+      <div class="score-big">${score}</div>
+      <div class="score-denom">จาก ${total} ข้อ (${pct}%)</div>
+      <div style="margin:16px 0;"><span class="grade-pill ${gc}">${grade}</span></div>
+      <div style="color:var(--text-muted);margin-bottom:24px;">${msg}</div>
+      <div class="feedback-box">${fbMsg}</div>
+      <div class="grid-stats">
+        <div class="stat-box"><div class="stat-num" style="color:var(--green)">${score}</div><div class="slbl">ตอบถูก</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:var(--red)">${total-score}</div><div class="slbl">ตอบผิด</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:var(--primary)">${pct}%</div><div class="slbl">คะแนน</div></div>
+      </div>
+      <button class="btn btn-primary" onclick="location.reload()">🔄 สุ่มข้อสอบทำใหม่อีกครั้ง</button>
+    </div>
+    <div class="card" style="margin-top:4px;">
+      <div class="review-title">📋 ตรวจสอบคำตอบอย่างละเอียด</div>
+      ${review}
+    </div>`;
+}
+
+function selectAnswer(i) { if (!state.checked[state.current]) { state.answers[state.current]=i; renderApp(); } }
+function checkAnswer()   { if (state.answers[state.current]!==null) { state.checked[state.current]=true; renderApp(); } }
+function goNext()  { if (state.current < state.questions.length-1) { state.current++; renderApp(); } }
+function goPrev()  { if (state.current > 0) { state.current--; renderApp(); } }
+function jumpTo(i) { state.current=i; renderApp(); }
+function showResult() { state.screen='result'; renderApp(); }
+
+renderApp();
+</script>
+</body>
+</html>
   .nav-buttons .btn-primary { width: 48%; }
 
   .prog-text { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
