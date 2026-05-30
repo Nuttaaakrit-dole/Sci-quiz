@@ -43,6 +43,381 @@
   .q-badge { font-size: 12px; color: var(--primary); font-weight: 700; margin-bottom: 12px; }
   .q-text { font-size: 18px; font-weight: 600; margin-bottom: 20px; line-height: 1.6; }
 
+  .choice { display: flex; align-items: center; background: #fff; border: 2px solid var(--gray-border); padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-size: 15px; font-family: 'Sarabun', sans-serif; text-align: left; transition: 0.2s; }
+  .choice.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); font-weight: 600; }
+  .choice.correct { border-color: var(--green); background: var(--green-light); color: var(--green); font-weight: 600; }
+  .choice.wrong { border-color: var(--red); background: var(--red-light); color: var(--red); font-weight: 600; }
+  
+  .c-let { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 50%; margin-right: 12px; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+  .choice.selected .c-let { background: var(--primary); color: #fff; }
+  .choice.correct .c-let { background: var(--green); color: #fff; }
+  .choice.wrong .c-let { background: var(--red); color: #fff; }
+
+  .feedback { padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6; margin-top: 16px; }
+  .feedback.ok { background: var(--green-light); border: 1px solid var(--green); color: #1f3a09; }
+  .feedback.no { background: var(--red-light); border: 1px solid var(--red); color: #521717; }
+  
+  .grid-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
+  .stat-box { background: #f9f9f9; padding: 16px 10px; border-radius: 12px; text-align: center; }
+  .stat-num { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  
+  .review-item { padding: 16px 0; border-bottom: 1px solid var(--gray-border); text-align: left; }
+  .review-item:last-child { border-bottom: none; }
+  .r-q { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  .r-a { font-size: 14px; margin-bottom: 4px; }
+  .r-exp { font-size: 13px; color: var(--text-muted); background: #f5f5f5; padding: 10px; border-radius: 8px; margin-top: 8px; }
+
+  .dot-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; justify-content: center; }
+  .dot { width: 32px; height: 32px; border-radius: 8px; border: none; font-family: 'Sarabun'; font-weight: 600; font-size: 12px; cursor: pointer; background: #e0e0e0; }
+  .dot.active { background: var(--primary); color: #fff; transform: scale(1.1); }
+  .dot.ok { background: var(--green); color: #fff; }
+  .dot.no { background: var(--red); color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="badge">N-NET • สกร. อำเภอโนนสัง</div>
+    <div class="title">🔬 แบบทดสอบวิทยาศาสตร์</div>
+    <div class="subtitle" id="subtitle-text">ระบบสุ่มข้อสอบและวิเคราะห์ผลรายบุคคล</div>
+  </div>
+  
+  <div id="app"></div>
+</div>
+
+<script>
+// ข้อมูลข้อสอบ 20 ข้อ
+const database = [
+  { cat: "สิ่งมีชีวิตและสิ่งแวดล้อม", q: "ส่วนประกอบใดของเซลล์พืชที่ทำหน้าที่สร้างอาหาร?", choices: ["คลอโรพลาสต์", "นิวเคลียส", "ผนังเซลล์", "ไซโทพลาซึม"], a: 0, exp: "คลอโรพลาสต์มีสารคลอโรฟิลล์สีเขียวที่ใช้ดักจับแสงเพื่อใช้ในการสังเคราะห์ด้วยแสง" },
+  { cat: "สิ่งมีชีวิตและสิ่งแวดล้อม", q: "ผู้ผลิต (Producer) ในห่วงโซ่อาหารมักจะเป็นสิ่งมีชีวิตกลุ่มใด?", choices: ["พืชสีเขียว", "สัตว์กินพืช", "สัตว์กินเนื้อ", "ผู้ย่อยสลาย"], a: 0, exp: "พืชสีเขียวสามารถสร้างอาหารเองได้ จึงเป็นผู้ผลิตและเป็นจุดเริ่มต้นของห่วงโซ่อาหารเสมอ" },
+  { cat: "สิ่งมีชีวิตและสิ่งแวดล้อม", q: "สัตว์ในข้อใดจัดเป็นสัตว์เลือดอุ่นทั้งหมด?", choices: ["โลมา, นกพิราบ", "กบ, งูเห่า", "ฉลาม, จระเข้", "ค้างคาว, เต่า"], a: 0, exp: "สัตว์เลี้ยงลูกด้วยนม (โลมา) และสัตว์ปีก (นก) เป็นสัตว์เลือดอุ่น" },
+  { cat: "สิ่งแวดล้อมและทรัพยากร", q: "ก๊าซใดเป็นสาเหตุหลักของปรากฏการณ์เรือนกระจกที่เกิดจากกิจกรรมมนุษย์?", choices: ["คาร์บอนไดออกไซด์", "ออกซิเจน", "ไนโตรเจน", "อาร์กอน"], a: 0, exp: "คาร์บอนไดออกไซด์จากการเผาไหม้ เป็นก๊าซเรือนกระจกที่สะสมในบรรยากาศมากที่สุด" },
+  { cat: "สิ่งแวดล้อมและทรัพยากร", q: "การทิ้งถ่านไฟฉายและแบตเตอรี่ ควรทิ้งลงในถังขยะสีใด?", choices: ["สีแดง (ขยะอันตราย)", "สีเหลือง (ขยะรีไซเคิล)", "สีเขียว (ขยะเปียก)", "สีน้ำเงิน (ขยะทั่วไป)"], a: 0, exp: "แบตเตอรี่และถ่านไฟฉายมีสารเคมีโลหะหนัก จัดเป็นขยะอันตราย (ถังสีแดง)" },
+  { cat: "สารและสมบัติของสาร", q: "การที่น้ำแข็งเปลี่ยนสถานะเป็นน้ำเหลว เรียกว่ากระบวนการใด?", choices: ["การหลอมเหลว", "การกลายเป็นไอ", "การควบแน่น", "การระเหิด"], a: 0, exp: "ของแข็งเปลี่ยนเป็นของเหลวเรียกว่า การหลอมเหลว (Melting)" },
+  { cat: "สารและสมบัติของสาร", q: "ข้อใดคือการเปลี่ยนแปลงทางเคมี?", choices: ["การเกิดสนิมของเหล็ก", "การละลายน้ำตาลในน้ำ", "การฉีกกระดาษเป็นชิ้นเล็กๆ", "การต้มน้ำจนเดือด"], a: 0, exp: "การเกิดสนิมทำให้เกิดสารใหม่ที่มีสมบัติต่างไปจากเหล็กเดิม เป็นการเปลี่ยนแปลงทางเคมี" },
+  { cat: "สารและสมบัติของสาร", q: "วัสดุในข้อใดเป็น 'ฉนวนไฟฟ้า' ทั้งหมด?", choices: ["ยาง, พลาสติก", "ทองแดง, อะลูมิเนียม", "เหล็ก, ไม้แห้ง", "เงิน, แก้ว"], a: 0, exp: "ยางและพลาสติกไม่ยอมให้กระแสไฟฟ้าไหลผ่าน จึงทำหน้าที่เป็นฉนวนไฟฟ้าที่ดี" },
+  { cat: "แรงและพลังงาน", q: "แรงดึงดูดของโลกที่กระทำต่อมวลของวัตถุ ทำให้เกิดสิ่งใด?", choices: ["น้ำหนัก", "ความหนาแน่น", "ปริมาตร", "ความเสียดทาน"], a: 0, exp: "น้ำหนัก คือผลคูณระหว่างมวลของวัตถุกับแรงโน้มถ่วงที่โลกดึงดูดวัตถุนั้น" },
+  { cat: "แรงและพลังงาน", q: "เพื่อลดแรงเสียดทานในการเคลื่อนย้ายตู้เสื้อผ้าขนาดใหญ่ ควรทำอย่างไร?", choices: ["ติดล้อที่ฐานตู้", "เพิ่มน้ำหนักในตู้", "ใช้เชือกเส้นใหญ่ขึ้นดึง", "ผลักตู้บนพื้นพรม"], a: 0, exp: "การใช้ล้อช่วยเปลี่ยนแรงเสียดทานเลื่อนเป็นแรงเสียดทานกลิ้ง ซึ่งมีค่าน้อยกว่า" },
+  { cat: "แรงและพลังงาน", q: "เมื่อแสงเดินทางผ่านตัวกลางที่ต่างชนิดกัน จะเกิดปรากฏการณ์ใดบริเวณรอยต่อ?", choices: ["การหักเหของแสง", "การสะท้อนกลับหมด", "การแทรกสอด", "การเลี้ยวเบน"], a: 0, exp: "เมื่อแสงผ่านตัวกลางที่มีความหนาแน่นต่างกัน ความเร็วแสงจะเปลี่ยน ทำให้เกิดการหักเห" },
+  { cat: "แรงและพลังงาน", q: "ข้อใดเป็นแหล่งกำเนิดพลังงานหมุนเวียนทั้งหมด?", choices: ["แสงอาทิตย์, ลม", "ถ่านหิน, น้ำมัน", "ก๊าซธรรมชาติ, ชีวมวล", "นิวเคลียร์, ถ่านหิน"], a: 0, exp: "แสงอาทิตย์ ลม และน้ำ เป็นพลังงานหมุนเวียน (ใช้แล้วไม่หมดไป)" },
+  { cat: "แรงและพลังงาน", q: "วงจรไฟฟ้าภายในบ้านควรต่อแบบใด เพื่อไม่ให้เครื่องใช้ไฟฟ้าอื่นดับเมื่อมีเครื่องหนึ่งเสีย?", choices: ["แบบขนาน", "แบบอนุกรม", "แบบผสม", "แบบใดก็ได้"], a: 0, exp: "การต่อแบบขนานทำให้กระแสไฟฟ้ามีทางเดินหลายทาง หากอุปกรณ์ใดพัง ทางอื่นก็ยังมีกระแสไหลผ่านได้" },
+  { cat: "ดาราศาสตร์และอวกาศ", q: "ปรากฏการณ์กลางวันและกลางคืน เกิดจากสาเหตุใด?", choices: ["โลกหมุนรอบตัวเอง", "โลกโคจรรอบดวงอาทิตย์", "ดวงจันทร์หมุนรอบโลก", "แกนโลกเอียง"], a: 0, exp: "การที่โลกหมุนรอบตัวเอง 1 รอบ ทำให้ด้านที่หันรับแสงอาทิตย์เป็นกลางวัน ด้านตรงข้ามเป็นกลางคืน" },
+  { cat: "ดาราศาสตร์และอวกาศ", q: "ฤดูกาลต่างๆ บนโลก เกิดขึ้นจากสาเหตุใดเป็นหลัก?", choices: ["แกนโลกเอียงและโคจรรอบดวงอาทิตย์", "โลกหมุนรอบตัวเองช้าลง", "ระยะห่างจากดวงจันทร์", "ปริมาณเมฆในชั้นบรรยากาศ"], a: 0, exp: "การที่แกนโลกเอียงขณะโคจรรอบดวงอาทิตย์ ทำให้แต่ละพื้นที่ได้รับแสงแดดต่างกัน เกิดเป็นฤดูกาล" },
+  { cat: "ดาราศาสตร์และอวกาศ", q: "ดาวเคราะห์ดวงใดในระบบสุริยะที่มีขนาดใหญ่ที่สุด?", choices: ["ดาวพฤหัสบดี", "ดาวเสาร์", "โลก", "ดาวศุกร์"], a: 0, exp: "ดาวพฤหัสบดี เป็นดาวเคราะห์แก๊สยักษ์ที่มีขนาดใหญ่ที่สุดในระบบสุริยะ" },
+  { cat: "กระบวนการทางวิทยาศาสตร์", q: "ข้อใดคือขั้นตอนแรกสุดของกระบวนการทางวิทยาศาสตร์?", choices: ["การสังเกตและระบุปัญหา", "การตั้งสมมติฐาน", "การทดลอง", "การรวบรวมข้อมูล"], a: 0, exp: "วิทยาศาสตร์เริ่มต้นจากการสังเกตปรากฏการณ์ และการตั้งปัญหาที่ต้องการหาคำตอบ" },
+  { cat: "วิทยาศาสตร์ในชีวิต", q: "อาหารในกลุ่มใดที่ให้ 'พลังงาน' แก่ร่างกายเป็นหลัก?", choices: ["คาร์โบไฮเดรตและไขมัน", "โปรตีนและวิตามิน", "เกลือแร่และน้ำ", "วิตามินและแร่ธาตุ"], a: 0, exp: "คาร์โบไฮเดรตและไขมัน เป็นสารอาหารหลักที่ให้พลังงานแก่ร่างกาย" },
+  { cat: "สารและสมบัติของสาร", q: "สารในข้อใดมีสถานะเป็น 'ก๊าซ' ทั้งหมดที่อุณหภูมิห้อง?", choices: ["ออกซิเจน, คาร์บอนไดออกไซด์", "น้ำ, ไฮโดรเจน", "ปรอท, ไนโตรเจน", "เหล็ก, ฮีเลียม"], a: 0, exp: "ออกซิเจนและคาร์บอนไดออกไซด์เป็นก๊าซ (ตัวลวง: น้ำและปรอทเป็นของเหลว)" },
+  { cat: "สิ่งแวดล้อมและทรัพยากร", q: "วิธีการใดช่วยลดปัญหาภาวะโลกร้อนได้ดีที่สุดด้วยตนเอง?", choices: ["ลดการใช้ถุงพลาสติกและปลูกต้นไม้", "เปิดแอร์ 20 องศา", "เผาขยะหลังบ้าน", "ขับรถยนต์ส่วนตัว"], a: 0, exp: "การลดพลาสติกและการปลูกต้นไม้ช่วยลดและดูดซับก๊าซคาร์บอนไดออกไซด์ได้โดยตรง" }
+];
+
+// สถานะของแอพพลิเคชัน
+let state = {
+  screen: 'login', // login, quiz, result
+  studentName: '',
+  studentId: '',
+  questions: [], // เก็บคำถามที่สุ่มแล้ว
+  answers: [], // เก็บคำตอบที่นักเรียนเลือก (index)
+  checked: [], // เก็บสถานะว่าข้อนี้กดส่งคำตอบหรือยัง (boolean)
+  current: 0
+};
+
+// ฟังก์ชันสุ่ม Array
+function shuffleArray(arr) {
+  let newArr = arr.slice();
+  for (let i = newArr.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    let temp = newArr[i];
+    newArr[i] = newArr[j];
+    newArr[j] = temp;
+  }
+  return newArr;
+}
+
+// ฟังก์ชันเริ่มทำแบบทดสอบ
+function startApp() {
+  const nameInput = document.getElementById('s_name').value;
+  const idInput = document.getElementById('s_id').value;
+  
+  if (nameInput.trim() === '') {
+    alert('กรุณากรอกชื่อ-นามสกุลก่อนเข้าสอบครับ');
+    return;
+  }
+  
+  state.studentName = nameInput;
+  state.studentId = idInput || 'สกร. อำเภอโนนสัง';
+  document.getElementById('subtitle-text').innerText = 'ผู้เข้าสอบ: ' + state.studentName;
+  
+  // เตรียมคำถาม
+  let shuffledDB = shuffleArray(database);
+  state.questions = [];
+  
+  for (let i = 0; i < shuffledDB.length; i++) {
+    let q = shuffledDB[i];
+    let correctText = q.choices[q.a];
+    let newChoices = shuffleArray(q.choices);
+    let newCorrectIndex = newChoices.indexOf(correctText);
+    
+    state.questions.push({
+      cat: q.cat,
+      q: q.q,
+      exp: q.exp,
+      choices: newChoices,
+      correctAnswer: newCorrectIndex
+    });
+  }
+  
+  state.answers = new Array(state.questions.length).fill(null);
+  state.checked = new Array(state.questions.length).fill(false);
+  state.current = 0;
+  state.screen = 'quiz';
+  
+  renderApp();
+}
+
+// ควบคุมการแสดงผล
+function renderApp() {
+  const app = document.getElementById('app');
+  if (state.screen === 'login') {
+    app.innerHTML = `
+      <div class="card" style="text-align: center; padding: 40px 20px;">
+        <div style="font-size: 60px; margin-bottom: 10px;">👨🏻‍🔬</div>
+        <h2 style="color: var(--primary); margin-bottom: 10px;">ข้อมูลผู้เข้าสอบ</h2>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px;">ระบบจะสุ่มข้อสอบและสุ่มตัวเลือกใหม่ทุกครั้ง</p>
+        <div class="inp-group">
+          <label class="inp-label">ชื่อ-นามสกุล (บังคับ)</label>
+          <input type="text" id="s_name" class="inp-text" placeholder="ระบุชื่อและนามสกุล">
+        </div>
+        <div class="inp-group">
+          <label class="inp-label">รหัสนักศึกษา / สังกัด</label>
+          <input type="text" id="s_id" class="inp-text" value="สกร. อำเภอโนนสัง">
+        </div>
+        <button class="btn btn-primary" style="margin-top: 10px;" onclick="startApp()">เริ่มทำแบบทดสอบ 🚀</button>
+      </div>
+    `;
+  } 
+  else if (state.screen === 'quiz') {
+    let total = state.questions.length;
+    let curr = state.current;
+    let q = state.questions[curr];
+    let ans = state.answers[curr];
+    let isChecked = state.checked[curr];
+    let pct = Math.round(((curr + 1) / total) * 100);
+    
+    // สร้างปุ่มตัวเลือก
+    let letters = ['A', 'B', 'C', 'D'];
+    let choicesHTML = '';
+    for (let i = 0; i < 4; i++) {
+      let cssClass = 'choice';
+      if (isChecked) {
+        if (i === q.correctAnswer) cssClass += ' correct';
+        else if (i === ans && ans !== q.correctAnswer) cssClass += ' wrong';
+      } else {
+        if (i === ans) cssClass += ' selected';
+      }
+      
+      let disabledAttr = isChecked ? 'disabled' : '';
+      choicesHTML += `<button class="${cssClass}" ${disabledAttr} onclick="selectAnswer(${i})">
+                        <div class="c-let">${letters[i]}</div>
+                        <div>${q.choices[i]}</div>
+                      </button>`;
+    }
+    
+    // สร้าง Feedback
+    let fbHTML = '';
+    if (isChecked) {
+      if (ans === q.correctAnswer) {
+        fbHTML = `<div class="feedback ok">✅ <strong>ถูกต้อง!</strong><div class="fb-explain">💡 ${q.exp}</div></div>`;
+      } else {
+        fbHTML = `<div class="feedback no">❌ <strong>ยังไม่ถูกต้อง</strong> — คำตอบที่ถูกคือ: <strong>${q.choices[q.correctAnswer]}</strong><div class="fb-explain">💡 ${q.exp}</div></div>`;
+      }
+    }
+    
+    // สร้างปุ่มนำทาง
+    let navHTML = '';
+    let btnPrev = curr > 0 ? `<button class="btn btn-secondary" onclick="goPrev()">← ย้อนกลับ</button>` : `<div style="width:48%"></div>`;
+    let btnNext = '';
+    
+    if (isChecked) {
+      if (curr === total - 1) {
+        btnNext = `<button class="btn btn-primary" onclick="showResult()">ประมวลผลคะแนน 🏆</button>`;
+      } else {
+        btnNext = `<button class="btn btn-primary" onclick="goNext()">ถัดไป →</button>`;
+      }
+    } else {
+      let dis = ans === null ? 'disabled' : '';
+      btnNext = `<button class="btn btn-primary" ${dis} onclick="checkAnswer()">ตรวจคำตอบ ✓</button>`;
+    }
+    navHTML = `<div class="nav-buttons">${btnPrev}${btnNext}</div>`;
+    
+    // สร้างจุด Navigation
+    let dotsHTML = '<div class="dot-nav">';
+    for (let i = 0; i < total; i++) {
+      let dClass = 'dot';
+      if (i === curr) dClass += ' active';
+      else if (state.checked[i]) {
+        dClass += (state.answers[i] === state.questions[i].correctAnswer) ? ' ok' : ' no';
+      }
+      dotsHTML += `<button class="${dClass}" onclick="jumpTo(${i})">${i+1}</button>`;
+    }
+    dotsHTML += '</div>';
+
+    app.innerHTML = `
+      <div class="card" style="padding: 16px 20px;">
+        <div class="prog-text">
+          <span>ข้อที่ ${curr + 1} จาก ${total}</span>
+          <span>ตอบแล้ว ${state.answers.filter(a => a !== null).length} ข้อ</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" style="width: ${pct}%"></div></div>
+      </div>
+      
+      <div class="card">
+        <div class="q-badge">${q.cat}</div>
+        <div class="q-text"><span class="q-num-circle">${curr + 1}</span> ${q.q}</div>
+        <div class="choices">${choicesHTML}</div>
+        ${fbHTML}
+        ${navHTML}
+      </div>
+      ${dotsHTML}
+    `;
+  }
+  else if (state.screen === 'result') {
+    let total = state.questions.length;
+    let score = 0;
+    let categoryStats = {};
+    
+    for (let i = 0; i < total; i++) {
+      let q = state.questions[i];
+      if (!categoryStats[q.cat]) categoryStats[q.cat] = { t: 0, c: 0 };
+      categoryStats[q.cat].t++;
+      
+      if (state.answers[i] === q.correctAnswer) {
+        score++;
+        categoryStats[q.cat].c++;
+      }
+    }
+    
+    let pct = Math.round((score / total) * 100);
+    let grade = '', gClass = '', msg = '';
+    
+    if (pct >= 80) { grade = 'ดีมาก (A)'; gClass = 'grade-A'; msg = 'ยอดเยี่ยม! พื้นฐานวิทยาศาสตร์แน่นมาก'; }
+    else if (pct >= 60) { grade = 'ดี (B)'; gClass = 'grade-B'; msg = 'ทำได้ดีครับ มีความเข้าใจในเกณฑ์มาตรฐาน'; }
+    else if (pct >= 50) { grade = 'พอใช้ (C)'; gClass = 'grade-C'; msg = 'ผ่านเกณฑ์ขั้นต่ำ ควรศึกษาทบทวนเพิ่มเติม'; }
+    else { grade = 'ต้องปรับปรุง (D)'; gClass = 'grade-D'; msg = 'ไม่เป็นไรครับ ลองอ่านคำอธิบายและทำใหม่อีกครั้งนะ'; }
+    
+    // หาจุดอ่อน
+    let weak = [];
+    for (let cat in categoryStats) {
+      if (categoryStats[cat].t > 0 && (categoryStats[cat].c / categoryStats[cat].t) <= 0.5) {
+        weak.push(cat);
+      }
+    }
+    
+    let fbMsg = weak.length > 0 
+      ? `📉 <strong>ระบบวิเคราะห์จุดอ่อน:</strong> คุณมีข้อผิดพลาดบ่อยในสาระ <strong>${weak.join(' และ ')}</strong> แนะนำให้ทบทวนเนื้อหาส่วนนี้เพิ่มเติมครับ`
+      : `✨ <strong>ระบบวิเคราะห์:</strong> ยอดเยี่ยมมาก! คุณไม่มีจุดอ่อนที่น่ากังวลในสาระใดเลย`;
+
+    let today = new Date();
+    let dateString = today.getDate() + '/' + (today.getMonth()+1) + '/' + (today.getFullYear()+543);
+
+    // สร้าง Review
+    let reviewHTML = '<div class="card" style="margin-top:20px"><div class="review-title">📋 ตรวจสอบคำตอบอย่างละเอียด</div>';
+    for (let i = 0; i < total; i++) {
+      let q = state.questions[i];
+      let isCorr = (state.answers[i] === q.correctAnswer);
+      let userText = state.answers[i] !== null ? q.choices[state.answers[i]] : '(ไม่ได้ตอบ)';
+      let icon = isCorr ? '✓' : '✗';
+      let iconCls = isCorr ? 'ri-ok' : 'ri-no';
+      
+      reviewHTML += `
+        <div class="review-item">
+          <div class="r-q"><span class="ri-tick ${iconCls}">${icon}</span> ข้อ ${i+1}: ${q.q}</div>
+          <div class="r-a" style="color:var(--text-muted)">คุณตอบ: ${userText}</div>
+          <div class="r-a" style="color:var(--green); font-weight:600;">เฉลย: ${q.choices[q.correctAnswer]}</div>
+          <div class="r-exp">💡 ${q.exp}</div>
+        </div>
+      `;
+    }
+    reviewHTML += '</div>';
+
+    app.innerHTML = `
+      <div class="card" style="text-align:center; padding:32px 20px;">
+        <div class="cert-header">รายงานผลการทดสอบวิทยาศาสตร์</div>
+        <div class="cert-name">คุณ ${state.studentName}</div>
+        <div class="cert-meta">รหัส/สังกัด: ${state.studentId} | วันที่สอบ: ${dateString}</div>
+        
+        <div style="font-size:60px; margin: 10px 0;">${pct >= 50 ? '🏆' : '📖'}</div>
+        <div class="score-big">${score}</div>
+        <div class="score-denom">จาก ${total} ข้อ (${pct}%)</div>
+        <div style="margin: 16px 0;"><span class="grade-pill ${gClass}">${grade}</span></div>
+        <div style="color:var(--text-muted); margin-bottom: 24px;">${msg}</div>
+        
+        <div class="feedback-box">${fbMsg}</div>
+        
+        <div class="grid-stats">
+          <div class="stat-box"><div class="stat-num" style="color:var(--green)">${score}</div><div class="slbl">ตอบถูก</div></div>
+          <div class="stat-box"><div class="stat-num" style="color:var(--red)">${total - score}</div><div class="slbl">ตอบผิด</div></div>
+          <div class="stat-box"><div class="stat-num" style="color:var(--primary)">${pct}%</div><div class="slbl">คะแนน</div></div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="location.reload()">🔄 สุ่มข้อสอบทำใหม่อีกครั้ง</button>
+      </div>
+      ${reviewHTML}
+    `;
+  }
+}
+
+// Action Functions
+function selectAnswer(index) {
+  if (state.checked[state.current]) return;
+  state.answers[state.current] = index;
+  renderApp();
+}
+
+function checkAnswer() {
+  if (state.answers[state.current] === null) return;
+  state.checked[state.current] = true;
+  renderApp();
+}
+
+function goNext() {
+  if (state.current < state.questions.length - 1) {
+    state.current++;
+    renderApp();
+  }
+}
+
+function goPrev() {
+  if (state.current > 0) {
+    state.current--;
+    renderApp();
+  }
+}
+
+function jumpTo(index) {
+  state.current = index;
+  renderApp();
+}
+
+function showResult() {
+  state.screen = 'result';
+  renderApp();
+}
+
+// Initial Call
+renderApp();
+</script>
+</body>
+</html>
+  .nav-buttons .btn-primary { width: 48%; }
+
+  .prog-text { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .prog-bar { background: #eee; height: 10px; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  .prog-fill { background: var(--primary); height: 100%; width: 0%; transition: 0.3s; }
+
+  .q-badge { font-size: 12px; color: var(--primary); font-weight: 700; margin-bottom: 12px; }
+  .q-text { font-size: 18px; font-weight: 600; margin-bottom: 20px; line-height: 1.6; }
+
   /* แก้ไขส่วนของ Choices เพื่อให้กล่องมีความสูงเท่ากัน */
   .choices { 
     display: flex; 
